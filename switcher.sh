@@ -41,9 +41,9 @@ while true; do
 		selected_version=${version_array[$choice]}
 		version_digits=$(echo "$selected_version" | grep -oE '[0-9]+\.[0-9]+\.?[0-9]*')
 		read -p "Are you sure about change to version $version_digits? (Y/n): " confirm
-		confirm="${confirm:-S}"
+		confirm="${confirm:-Y}"
 
-		if [[ $confirm == [sS] ]]; then
+		if [[ $confirm == [yY] ]]; then
 			break
 		fi
 	else
@@ -55,7 +55,9 @@ done
 sudo update-alternatives --set php /usr/bin/php"$version_digits"
 sudo update-alternatives --set phar /usr/bin/phar"$version_digits"
 sudo update-alternatives --set phar.phar /usr/bin/phar.phar"$version_digits"
-sudo a2dismod php"${VAR::-3}"
+old_version=$(echo "$current_version" | cut -d '.' -f 1,2)
+sudo a2dismod php"$old_version"
+sudo a2dismod mpm_event
 sudo a2enmod php"$version_digits"
 sudo systemctl restart apache2
 clear
